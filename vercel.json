@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/oc-name-creator", "destination": "/" }
+  ]
+}
