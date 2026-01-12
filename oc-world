@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>你的OC被这个世界如何对待？｜Hikaly</title>
+  <style>
+    :root{
+      /* P5 Core Palette */
+      --p5-red: #d7031c;       /* 标志性红色 */
+      --p5-black: #111111;     /* 深黑 */
+      --p5-white: #f0f0f0;     /* 灰白 */
+      --p5-yellow: #fde100;    /* 亮黄点缀 */
+      --p5-gray: #555555;
+      
+      --bg: var(--p5-red);
+      --font: "Impact", "Haettenschweiler", "Franklin Gothic Bold", "Arial Black", sans-serif; /* 尽量用粗体 */
+      --font-body: "Microsoft YaHei", "Heiti SC", sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    
+    body{
+      margin:0;
+      font-family: var(--font-body);
+      background-color: #222;
+      color: var(--p5-black);
+      overflow-x:hidden;
+      /* 动态背景纹理 */
+      background-image: 
+        linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a),
+        linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    /* --- P5 Background Elements --- */
+    .bg-slices{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background: linear-gradient(115deg, transparent 40%, var(--p5-red) 40%, var(--p5-red) 60%, transparent 60%);
+      opacity: 0.8;
+      transform: scale(1.5);
+    }
+    
+    .bg-halftone{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image: radial-gradient(circle, var(--p5-black) 10%, transparent 11%);
+      background-size: 15px 15px;
+      opacity: 0.1;
+    }
+
+    .wrap{
+      position:relative;
+      z-index:2;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header */
+    .mast{
+      display:flex; flex-direction: column; align-items:flex-start;
+      margin-bottom: 30px;
+      transform: rotate(-2deg); /* 整体微倾斜 */
+    }
+    
+    .title h1{
+      font-family: var(--font);
+      font-size: clamp(32px, 6vw, 60px);
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--p5-white);
+      text-shadow: 4px 4px 0px var(--p5-black);
+      background: var(--p5-black);
+      padding: 10px 20px;
+      transform: skewX(-10deg);
+      display: inline-block;
+      margin: 0;
+      border: 3px solid var(--p5-white);
+    }
+    
+    .title h1 .tag{
+      background: var(--p5-yellow);
+      color: var(--p5-black);
+      padding: 2px 10px;
+      font-size: 0.5em;
+      vertical-align: middle;
+      border: 2px solid var(--p5-black);
+      transform: rotate(-5deg);
+      display: inline-block;
+      /* FIX: 移除继承的阴影，解决重影问题 */
+      text-shadow: none; 
+    }
+
+    .title .sub{
+      font-family: var(--font-body);
+      background: var(--p5-white);
+      color: var(--p5-black);
+      padding: 10px 15px;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 15px;
+      border: 2px solid var(--p5-black);
+      box-shadow: 5px 5px 0 var(--p5-black);
+      max-width: 90%;
+      transform: skewX(-5deg);
+    }
+
+    .badge{
+      margin-top: 15px;
+      background: var(--p5-black);
+      color: var(--p5-white);
+      padding: 5px 15px;
+      font-size: 12px;
+      border: 1px solid var(--p5-white);
+      display: inline-flex; align-items: center; gap: 8px;
+      transform: rotate(1deg);
+    }
+    .badge .dot{
+      width: 8px; height: 8px; background: var(--p5-red);
+      transform: rotate(45deg);
+    }
+
+    /* Layout */
+    .grid{
+      display:grid; grid-template-columns: 1fr; gap: 20px;
+    }
+    @media (min-width: 768px){
+      .grid{ grid-template-columns: 2fr 1fr; }
+    }
+
+    /* Main Card Style (Comic Panel) */
+    .card{
+      background: var(--p5-white);
+      border: 4px solid var(--p5-black);
+      position: relative;
+      /* 伪装成不规则多边形 */
+      clip-path: polygon(2% 0%, 100% 0%, 100% 98%, 98% 100%, 0% 100%, 0% 2%); 
+    }
+    
+    .card-inner{
+      padding: 25px;
+    }
+
+    /* Label */
+    .label{
+      background: var(--p5-black);
+      color: var(--p5-white);
+      display: inline-block;
+      padding: 5px 15px;
+      font-family: var(--font);
+      font-size: 18px;
+      transform: skewX(-15deg) translateX(-10px);
+      border-right: 5px solid var(--p5-red);
+    }
+    .label b { color: var(--p5-yellow); }
+    .label span { font-weight: normal; font-size: 0.8em; margin-left: 5px;}
+    .label .slash { display: none; } /* 隐藏原有的 slash 元素 */
+
+    /* Progress Bar (Jagged) */
+    .progress{ margin: 20px 0; }
+    .progress-top{
+      display: flex; justify-content: space-between;
+      font-weight: bold; font-size: 12px; color: var(--p5-black);
+      margin-bottom: 5px;
+    }
+    .bar{
+      height: 18px;
+      background: var(--p5-black);
+      border: 2px solid var(--p5-black);
+      transform: skewX(-20deg);
+      overflow: hidden;
+    }
+    .bar > i {
+      display: block; height: 100%; width: 0%;
+      background: var(--p5-red);
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.2) 5px, rgba(0,0,0,0.2) 10px);
+      transition: width 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    /* Question Box */
+    .q{
+      margin-top: 20px;
+      padding: 10px;
+      position: relative;
+    }
+    .q .qno{
+      position: absolute; top: -15px; left: -10px;
+      background: var(--p5-red); color: var(--p5-white);
+      font-family: var(--font); font-size: 24px;
+      padding: 5px 15px;
+      transform: rotate(-10deg);
+      border: 2px solid var(--p5-white);
+      box-shadow: 3px 3px 0 var(--p5-black);
+      z-index: 10;
+    }
+    
+    .q h2{
+      font-size: 22px;
+      background: var(--p5-black);
+      color: var(--p5-white);
+      padding: 20px 20px 20px 30px;
+      margin: 0 0 10px;
+      /* 不规则形状 */
+      clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
+      transform: rotate(1deg);
+    }
+    
+    .q .hint{
+      color: var(--p5-gray);
+      font-style: italic;
+      border-left: 4px solid var(--p5-red);
+      padding-left: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Options (Buttons) */
+    .opts{ display: grid; gap: 12px; }
+    
+    .btn{
+      width: 100%;
+      background: transparent;
+      border: 2px solid var(--p5-black);
+      color: var(--p5-black);
+      padding: 15px;
+      cursor: pointer;
+      position: relative;
+      display: flex; align-items: center; gap: 15px;
+      transition: all 0.1s;
+      
+      /* P5 Button Shape */
+      transform: skewX(-15deg);
+    }
+    
+    /* 反向倾斜文字，让文字保持直立 */
+    .btn .k, .btn .t { transform: skewX(15deg); }
+
+    .btn:hover{
+      background: var(--p5-black);
+      color: var(--p5-white);
+      border-color: var(--p5-black);
+      transform: skewX(-15deg) scale(1.02) translateX(5px);
+      box-shadow: -5px 5px 0 var(--p5-red);
+    }
+    
+    .btn .k{
+      background: var(--p5-red);
+      color: var(--p5-white);
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font); font-size: 20px;
+      border: 2px solid var(--p5-black);
+    }
+    
+    .btn .t{ flex: 1; text-align: left; font-weight: bold; }
+    .btn .t small { display: block; font-weight: normal; font-size: 12px; opacity: 0.7; }
+    .btn:hover .t small { color: var(--p5-yellow); opacity: 1; }
+
+    /* Controls */
+    .controls{ display: flex; gap: 15px; margin-top: 25px; }
+    
+    .ghost, .primary{
+      flex: 1;
+      border: 2px solid var(--p5-black);
+      padding: 10px;
+      font-family: var(--font-body);
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      transform: skewX(-10deg);
+      transition: all 0.2s;
+    }
+    
+    .ghost{ background: transparent; color: var(--p5-black); }
+    .ghost:hover{ background: #ccc; }
+    
+    .primary{
+      background: var(--p5-red);
+      color: var(--p5-white);
+      box-shadow: 4px 4px 0 var(--p5-black);
+    }
+    .primary:hover{
+      background: var(--p5-black);
+      color: var(--p5-red);
+      transform: skewX(-10deg) translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--p5-white);
+    }
+
+    /* Sidebar */
+    .side{ display: flex; flex-direction: column; gap: 15px; }
+    .mini{
+      background: var(--p5-black);
+      color: var(--p5-white);
+      padding: 15px;
+      border: 2px solid var(--p5-white);
+      transform: rotate(2deg);
+      box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
+    }
+    .mini:nth-child(2) { transform: rotate(-1deg); background: var(--p5-red); }
+    
+    .mini h3{
+      margin: 0 0 10px;
+      font-family: var(--font);
+      color: var(--p5-yellow);
+      border-bottom: 2px dashed var(--p5-white);
+      padding-bottom: 5px;
+    }
+    .mini p{ font-size: 13px; line-height: 1.4; opacity: 0.9; }
+    .mini .pill{
+      background: var(--p5-white);
+      color: var(--p5-black);
+      padding: 4px 8px;
+      border-radius: 0;
+      font-weight: bold;
+      font-size: 12px;
+      margin-top: 8px;
+      display: inline-block;
+      transform: skewX(-10deg);
+    }
+    .pill i { display: none; } /* P5不需要圆点 */
+
+    /* Result View (The "All-Out Attack" Finish) */
+    /* FIX: 增加 display:none 默认隐藏结果页 */
+    .result { display: none; } 
+    
+    .result .hero{
+      background: var(--p5-red);
+      color: var(--p5-white);
+      padding: 30px;
+      border: 5px solid var(--p5-black);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* 结果页背景大字装饰 */
+    .result .hero:before{
+      content: "FINISH";
+      position: absolute; right: -20px; bottom: -40px;
+      font-family: var(--font); font-size: 120px;
+      color: var(--p5-black); opacity: 0.15;
+      transform: rotate(-15deg); z-index: 0;
+    }
+
+    .result h2{
+      font-family: var(--font);
+      font-size: 32px;
+      text-transform: uppercase;
+      background: var(--p5-black);
+      color: var(--p5-white);
+      padding: 10px 20px;
+      display: inline-block;
+      transform: skewX(-10deg) rotate(-2deg);
+      box-shadow: 5px 5px 0 var(--p5-yellow);
+      margin-bottom: 15px;
+    }
+    
+    .result .meta{ font-weight: bold; color: var(--p5-black); margin-bottom: 15px; font-size: 14px;}
+    
+    .result .quote{
+      position: relative; z-index: 1;
+      font-family: serif; font-weight: bold; font-size: 18px;
+      font-style: italic;
+      color: var(--p5-white);
+      text-shadow: 2px 2px 0 var(--p5-black);
+      margin: 20px 0;
+      padding: 15px;
+      border-top: 3px solid var(--p5-black);
+      border-bottom: 3px solid var(--p5-black);
+      background: rgba(0,0,0,0.1);
+    }
+
+    .kv{ display: grid; gap: 10px; position: relative; z-index: 1; }
+    .kv .row{
+      background: var(--p5-white);
+      color: var(--p5-black);
+      padding: 10px 15px;
+      border: 2px solid var(--p5-black);
+      transform: skewX(-5deg);
+    }
+    .kv .row b{
+      display: inline-block;
+      background: var(--p5-black);
+      color: var(--p5-yellow);
+      padding: 2px 6px;
+      font-size: 12px;
+      margin-right: 5px;
+      text-transform: uppercase;
+    }
+    .kv .row span{ font-size: 14px; font-weight: bold; }
+
+    /* Footer */
+    .footer{ margin-top: 30px; font-family: var(--font); letter-spacing: 1px; }
+
+    /* Toast */
+    .toast{
+      background: var(--p5-black);
+      color: var(--p5-yellow);
+      border: 2px solid var(--p5-white);
+      border-radius: 0;
+      padding: 15px 30px;
+      font-family: var(--font);
+      font-size: 16px;
+      transform: translateX(-50%) skewX(-15deg);
+      box-shadow: 5px 5px 0 var(--p5-red);
+    }
+    
+    /* Animation for questions */
+    @keyframes slashEntry {
+      0% { opacity: 0; transform: translateX(50px) skewX(-15deg); }
+      100% { opacity: 1; transform: translateX(0) skewX(-15deg); }
+    }
+    .btn { animation: slashEntry 0.3s ease-out backwards; }
+    .btn:nth-child(1) { animation-delay: 0.05s; }
+    .btn:nth-child(2) { animation-delay: 0.1s; }
+    .btn:nth-child(3) { animation-delay: 0.15s; }
+    .btn:nth-child(4) { animation-delay: 0.2s; }
+
+  </style>
+</head>
+
+<body>
+  <div class="bg-slices"></div>
+  <div class="bg-halftone"></div>
+
+  <div class="wrap">
+    <div class="mast">
+      <div class="title">
+        <h1><span class="tag">TAKE YOUR HEART</span> 你的OC被这个世界如何对待？</h1>
+        <div class="sub">
+          15道命运提问，把“性格”丢掉——你要测的是：世界对你的OC施加了哪种规则。<br/>
+          （不需要提前设定OC，也可以把回答当成“新OC生成器”。）
+        </div>
+      </div>
+      <div class="badge" aria-label="meta badge">
+        <span class="dot"></span>
+        <div class="txt">≈ 15 Q · 10 结果 · 二次元命运卡</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-inner">
+          <div class="label"><span class="slash"></span><b id="modeTitle">MISSION</b><span id="modeSub">答题中</span></div>
+
+          <div class="progress">
+            <div class="progress-top">
+              <span id="progText">进度：0 / 15</span>
+              <span id="progHint">选择一个选项即可继续</span>
+            </div>
+            <div class="bar"><i id="barFill"></i></div>
+          </div>
+
+          <div id="quizView">
+            <div class="q" id="qBox">
+              <div class="qno" id="qNo">Q1</div>
+              <h2 id="qTitle">加载中…</h2>
+              <div class="hint" id="qHint">从四个命运分叉里选一个。</div>
+              <div class="opts" id="opts"></div>
+
+              <div class="controls">
+                <button class="ghost" id="btnBack" type="button">← 上一题</button>
+                <button class="ghost" id="btnReset" type="button">重置</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="result" id="resultView">
+            <div class="hero">
+              <h2 id="rTitle">结果标题</h2>
+              <p class="meta" id="rMeta">meta</p>
+              <div class="quote" id="rQuote">quote</div>
+
+              <div class="kv">
+                <div class="row">
+                  <b>世界态度</b>
+                  <span id="rAttitude"></span>
+                </div>
+                <div class="row">
+                  <b>命运特征</b>
+                  <span id="rTraits"></span>
+                </div>
+                <div class="row">
+                  <b>适合的OC走向</b>
+                  <span id="rArc"></span>
+                </div>
+                <div class="row">
+                  <b>可直接写进设定的台词</b>
+                  <span id="rLine"></span>
+                </div>
+              </div>
+
+              <div class="controls" style="margin-top:20px">
+                <button class="primary" id="btnCopy" type="button">复制结果文案</button>
+                <button class="ghost" id="btnRestart" type="button">再测一次</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">created by <b>Hikaly</b></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="mini">
+          <h3>使用方式</h3>
+          <p>
+            你可以把“你”当作OC本人回答；也可以“捏一个新OC”——用直觉选，得到一张命运卡就是初始设定。
+          </p>
+          <div class="pill"><i></i> Tip：别追求理性，追求“爽感与命运感”。</div>
+        </div>
+
+        <div class="mini">
+          <h3>结果说明</h3>
+          <p>
+            10种世界对待方式：<br/>
+            ①祝福回收 ②无视背景 ③标记监控 ④驯化改造 ⑤利用工具
+            ⑥威胁清除 ⑦循环惩罚 ⑧夺走姓名 ⑨延迟拯救 ⑩关键变量
+          </p>
+          <div class="pill"><i></i> 命运只留下了一行注释。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+  <script>
+    /**
+     * 你的OC被这个世界如何对待？
+     * 15题，4选项。每个选项给 2 个结果类型加权。
+     * 最终取分最高的类型（并用 tieBreak 做轻微稳定化）。
+     */
+
+    // 10 result types
+    const TYPES = [
+      "BLESS_REVOKED",   // 祝福回收
+      "IGNORED_NOISE",   // 无视背景
+      "MARKED_WATCHED",  // 标记监控
+      "TAMED_REFORGED",  // 驯化改造
+      "USED_TOOL",       // 利用工具
+      "PURGED_THREAT",   // 威胁清除
+      "PUNISHED_LOOP",   // 循环惩罚
+      "NAME_STOLEN",     // 夺走姓名
+      "DELAYED_RESCUE",  // 延迟拯救
+      "KEY_VARIABLE"     // 关键变量
+    ];
+
+    const RESULT_DATA = {
+      BLESS_REVOKED: {
+        title: "祝福回收型：先给糖，再收回",
+        meta: "你被允许短暂发光，但不被允许长期拥有。",
+        quote: "世界最擅长的不是毁灭你，而是让你相信自己差一点就能幸福。",
+        attitude: "它会给你机会、给你温柔的错觉，然后在你伸手时抽走。",
+        traits: "你常被奖励来推动剧情，但每次奖励都带着条件与回收机制；幸福是诱饵，失去是教学。",
+        arc: "伪HE / 甜到发苦 / “差一点就成功”的反复 / 关键时刻被迫选择放手。",
+        line: "「我拿到过光，所以更清楚黑暗长什么样。」"
+      },
+      IGNORED_NOISE: {
+        title: "无视背景型：你被当成噪音",
+        meta: "世界没有恶意，只是把你当成“不会影响主线的存在”。",
+        quote: "最冷酷的不是针对，而是连针对都不值得。",
+        attitude: "它让你在角落里自我燃烧，却从不回头确认你是否还在。",
+        traits: "你做的很多事没有回响；你存在感被稀释；偶尔被想起也只是“顺便”。",
+        arc: "边缘主角 / 静默逆袭 / 从“没人看见”到“必须看见” / 低燃爆发。",
+        line: "「如果世界不写我进史书，那我就把史书改成我。」"
+      },
+      MARKED_WATCHED: {
+        title: "标记监控型：你被世界盯上了",
+        meta: "你不是普通人——至少世界这样认为。",
+        quote: "你以为那是命运的注视，其实是系统的监控。",
+        attitude: "它给你编号、标签、风险评级；你的每次呼吸都被记录。",
+        traits: "你经常遇到“刚好有人出现”的巧合；你越想自由，追踪越紧；你的一切被解释成“异常”。",
+        arc: "逃亡/潜行 / 猫鼠游戏 / 监控社会反击 / 身份暴露后的清算。",
+        line: "「我不是被看见——我是被锁定。」"
+      },
+      TAMED_REFORGED: {
+        title: "驯化改造型：你被强行“变好”",
+        meta: "世界不想杀你，它想“修正你”。",
+        quote: "他们说这是拯救——但你听见的是锯子声。",
+        attitude: "它试图把你改造成可用、可控、可爱的形状。",
+        traits: "你被教育“别这样”；你被训练“像个人”；你被奖励“听话”；你逐渐忘了原来的自己。",
+        arc: "反洗脑 / 重拾自我 / 伪装顺从 / 破茧式反叛。",
+        line: "「你们想把我修好？——可我从来就不是你们的坏。」"
+      },
+      USED_TOOL: {
+        title: "利用工具型：你被需要，但不被承认",
+        meta: "你在关键节点总被推上台，但谢幕时永远没有掌声。",
+        quote: "世界记得你做过什么，但不记得你是谁。",
+        attitude: "它把你当成解决问题的手段，而不是一个完整的人。",
+        traits: "你被委派任务、承担风险；你的痛苦被当成成本；你成功后功劳会被转移。",
+        arc: "工具人反转 / 夺回叙事权 / “我不干了”即末日 / 复仇与自救并行。",
+        line: "「既然我只是工具，那我也可以选择断电。」"
+      },
+      PURGED_THREAT: {
+        title: "威胁清除型：你被世界当成灾害",
+        meta: "你还没做坏事，世界就已经决定你会做。",
+        quote: "他们害怕的不是你做了什么，而是你“可能会”。",
+        attitude: "它倾向于先发制人：隔离、封锁、清除、抹除。",
+        traits: "你常被误解为反派；你越解释越像狡辩；你一旦反击，就会被证明“果然如此”。",
+        arc: "冤罪/黑化边缘 / 反英雄 / “被逼成怪物” / 以恶制恶。",
+        line: "「你们叫我怪物？——那就别怪我学会咬人。」"
+      },
+      PUNISHED_LOOP: {
+        title: "循环惩罚型：你被困在重复里",
+        meta: "世界给你同一套关卡，只是换不同皮肤。",
+        quote: "你不是输给一次失败——你输给了被安排的重复。",
+        attitude: "它不让你死，也不让你赢；它让你一次次接近出口，又一次次回到起点。",
+        traits: "你遇到“似曾相识”；你总在同类错误上被惩罚；你开始怀疑记忆与时间是否真实。",
+        arc: "时间循环 / 自我对抗 / 找出隐藏规则 / 用一次“偏离”砸碎系统。",
+        line: "「我不是在重来——我是在学习怎么毁掉这条轨道。」"
+      },
+      NAME_STOLEN: {
+        title: "夺走姓名型：你被抹掉身份",
+        meta: "你还在，但“你是谁”被世界偷走了。",
+        quote: "当名字被夺走，连痛苦都变得没有归属。",
+        attitude: "它会篡改档案、擦除记录、切断关系，让你在社会意义上消失。",
+        traits: "你无法证明自己；你被迫用假身份活着；你认识的人不再承认你；你开始怀疑自己是否存在过。",
+        arc: "身份夺回 / 记忆追溯 / 伪装潜入 / 在“无名”里重建自我。",
+        line: "「我会把我的名字，从你们的喉咙里取回来。」"
+      },
+      DELAYED_RESCUE: {
+        title: "延迟拯救型：救赎永远晚一步",
+        meta: "世界不是不救你，是总在“差一点”的时刻迟到。",
+        quote: "你等到的不是救援，是‘本该更早出现的那个人’。",
+        attitude: "它把你的希望当作节奏控制：让你等、让你熬、让你在最后一秒才见光。",
+        traits: "你常在濒临崩溃时被拉一把；你习惯性不敢相信好事；你把“被救”当成负债。",
+        arc: "迟来的拥抱 / 代价式HE / “我先学会自救” / 接纳与和解。",
+        line: "「如果你来得再晚一点，我就学会不需要你了。」"
+      },
+      KEY_VARIABLE: {
+        title: "关键变量型：你被当成系统的‘不稳定因素’",
+        meta: "你的一次选择，会让主线崩坏或重写。",
+        quote: "你不是配角——你是世界规则的漏洞。",
+        attitude: "它既想利用你，又害怕你；它试图预测你，但你永远不按剧本。",
+        traits: "你总在关键节点出现；你无意间改变他人命运；你被赋予“扭转局势”的权力与诅咒。",
+        arc: "主线改写 / 多结局分歧 / 系统对抗 / “我就是变量”宣言。",
+        line: "「别问我会选什么——我会让你们的选项失效。」"
+      }
+    };
+
+    // 15 questions, each option adds weights to 2 types
+    const QUESTIONS = [
+      {
+        q: "当世界第一次注意到你的OC时，它选择了：",
+        hint: "别想太多，选最像“命运宣判”的那句。",
+        options: [
+          { t: "给了一点温柔，然后很快收回。", s: { BLESS_REVOKED: 2, DELAYED_RESCUE: 1 } },
+          { t: "当作无关紧要的背景噪音。", s: { IGNORED_NOISE: 2, NAME_STOLEN: 1 } },
+          { t: "立刻标记、观察、记录。", s: { MARKED_WATCHED: 2, KEY_VARIABLE: 1 } },
+          { t: "试图把TA修正成“正常可用”。", s: { TAMED_REFORGED: 2, USED_TOOL: 1 } }
+        ]
+      },
+      {
+        q: "你的OC最常被剥夺的是：",
+        hint: "你写设定时最心痛的那一块。",
+        options: [
+          { t: "记忆：忘了谁、忘了为什么。", s: { PUNISHED_LOOP: 1, NAME_STOLEN: 2 } },
+          { t: "名字：被改名、被编号、被替换。", s: { NAME_STOLEN: 2, MARKED_WATCHED: 1 } },
+          { t: "选择权：总有人替TA决定。", s: { TAMED_REFORGED: 1, USED_TOOL: 2 } },
+          { t: "时间：来不及、追不上、永远迟到。", s: { DELAYED_RESCUE: 2, BLESS_REVOKED: 1 } }
+        ]
+      },
+      {
+        q: "当TA试图反抗时，世界最常用的手段是：",
+        hint: "这个选项决定世界的“压制风格”。",
+        options: [
+          { t: "温柔说服：你这样会受伤，听话。", s: { TAMED_REFORGED: 2, DELAYED_RESCUE: 1 } },
+          { t: "冷处理：不回应、不承认、不解释。", s: { IGNORED_NOISE: 2, USED_TOOL: 1 } },
+          { t: "立刻升级管制：监控、封锁、抓捕。", s: { MARKED_WATCHED: 2, PURGED_THREAT: 1 } },
+          { t: "贴上罪名：你就是麻烦本身。", s: { PURGED_THREAT: 2, KEY_VARIABLE: 1 } }
+        ]
+      },
+      {
+        q: "TA的“存在价值”通常被描述成：",
+        hint: "这题很关键：你是人，还是功能？",
+        options: [
+          { t: "“你很有用。”（但只在需要时）", s: { USED_TOOL: 2, IGNORED_NOISE: 1 } },
+          { t: "“你很危险。”（所以必须处理）", s: { PURGED_THREAT: 2, MARKED_WATCHED: 1 } },
+          { t: "“你很特别。”（所以要控制/研究）", s: { MARKED_WATCHED: 1, KEY_VARIABLE: 2 } },
+          { t: "“你很可怜。”（所以给你一点糖）", s: { BLESS_REVOKED: 2, DELAYED_RESCUE: 1 } }
+        ]
+      },
+      {
+        q: "TA最常遇到的“好事”是：",
+        hint: "好事的形态决定你的甜点口味（或陷阱）。",
+        options: [
+          { t: "被认可一瞬间，然后被夺走舞台。", s: { BLESS_REVOKED: 2, USED_TOOL: 1 } },
+          { t: "有人说要救TA，但总是晚一步。", s: { DELAYED_RESCUE: 2, PUNISHED_LOOP: 1 } },
+          { t: "系统漏洞让TA侥幸逃过一次。", s: { KEY_VARIABLE: 2, MARKED_WATCHED: 1 } },
+          { t: "被允许“当个普通人”，代价是失去自我。", s: { TAMED_REFORGED: 2, NAME_STOLEN: 1 } }
+        ]
+      },
+      {
+        q: "如果必须牺牲一样才能继续活下去，TA会先失去：",
+        hint: "别选你想要的，选你觉得世界会逼走的。",
+        options: [
+          { t: "情感：不再相信任何人。", s: { USED_TOOL: 1, PURGED_THREAT: 2 } },
+          { t: "归属：没有家、没有阵营。", s: { NAME_STOLEN: 2, IGNORED_NOISE: 1 } },
+          { t: "自由：被安排、被驯化。", s: { TAMED_REFORGED: 2, MARKED_WATCHED: 1 } },
+          { t: "希望：知道救赎不会按时到。", s: { DELAYED_RESCUE: 1, BLESS_REVOKED: 2 } }
+        ]
+      },
+      {
+        q: "世界最常用哪种方式“教育”TA？",
+        hint: "教育 = 规则灌输。",
+        options: [
+          { t: "让TA一次次重来，直到学会服从。", s: { PUNISHED_LOOP: 2, TAMED_REFORGED: 1 } },
+          { t: "让TA付出代价，但不告诉原因。", s: { BLESS_REVOKED: 1, MARKED_WATCHED: 2 } },
+          { t: "让TA成功，但把功劳拿走。", s: { USED_TOOL: 2, IGNORED_NOISE: 1 } },
+          { t: "让TA背上罪名，逼TA自证清白。", s: { PURGED_THREAT: 2, NAME_STOLEN: 1 } }
+        ]
+      },
+      {
+        q: "TA最怕的不是痛，而是：",
+        hint: "恐惧揭示你的核心伤口。",
+        options: [
+          { t: "被彻底遗忘：连恨都不配。", s: { IGNORED_NOISE: 2, NAME_STOLEN: 1 } },
+          { t: "被看穿：所有秘密都变成证据。", s: { MARKED_WATCHED: 2, PURGED_THREAT: 1 } },
+          { t: "被改写：变成别人期待的样子。", s: { TAMED_REFORGED: 2, BLESS_REVOKED: 1 } },
+          { t: "永远差一点：永远到不了终点。", s: { PUNISHED_LOOP: 2, DELAYED_RESCUE: 1 } }
+        ]
+      },
+      {
+        q: "当TA站在关键节点，世界更倾向于：",
+        hint: "关键节点 = 你是否是“变量”。",
+        options: [
+          { t: "把TA推上前台解决问题。", s: { USED_TOOL: 1, KEY_VARIABLE: 2 } },
+          { t: "立刻把TA隔离，防止扩散。", s: { PURGED_THREAT: 1, MARKED_WATCHED: 2 } },
+          { t: "把TA从记录里抹掉，免得麻烦。", s: { NAME_STOLEN: 2, IGNORED_NOISE: 1 } },
+          { t: "给TA一个“看似正确”的诱饵结局。", s: { BLESS_REVOKED: 2, DELAYED_RESCUE: 1 } }
+        ]
+      },
+      {
+        q: "TA最常听到的一句话是：",
+        hint: "选那句最像“世界在说话”的。",
+        options: [
+          { t: "“你是为了这个而存在的。”", s: { USED_TOOL: 2, TAMED_REFORGED: 1 } },
+          { t: "“我们必须看着你。”", s: { MARKED_WATCHED: 2, KEY_VARIABLE: 1 } },
+          { t: "“你不应该存在。”", s: { PURGED_THREAT: 2, NAME_STOLEN: 1 } },
+          { t: "“再等等，会好起来的。”", s: { DELAYED_RESCUE: 2, BLESS_REVOKED: 1 } }
+        ]
+      },
+      {
+        q: "TA的“反击方式”更像：",
+        hint: "这题会给你的结果一点“气质偏向”。",
+        options: [
+          { t: "不再配合：拒绝当工具。", s: { USED_TOOL: 2, KEY_VARIABLE: 1 } },
+          { t: "潜行与伪装：在监控里消失。", s: { MARKED_WATCHED: 1, NAME_STOLEN: 2 } },
+          { t: "撕破脸：既然当怪物就咬回去。", s: { PURGED_THREAT: 2, PUNISHED_LOOP: 1 } },
+          { t: "打破重复：用一次偏离摧毁系统。", s: { PUNISHED_LOOP: 2, KEY_VARIABLE: 1 } }
+        ]
+      },
+      {
+        q: "TA最容易被谁伤到？",
+        hint: "被谁伤到，说明你最想信谁。",
+        options: [
+          { t: "“说会救TA”的人。", s: { DELAYED_RESCUE: 2, BLESS_REVOKED: 1 } },
+          { t: "“称TA很有用”的人。", s: { USED_TOOL: 2, IGNORED_NOISE: 1 } },
+          { t: "“说TA不正常”的人。", s: { TAMED_REFORGED: 2, MARKED_WATCHED: 1 } },
+          { t: "“给TA贴罪名”的人。", s: { PURGED_THREAT: 2, NAME_STOLEN: 1 } }
+        ]
+      },
+      {
+        q: "TA的故事里最常出现的意象是：",
+        hint: "意象会让结果更“写作可用”。",
+        options: [
+          { t: "门口的光：差一点就能走出去。", s: { DELAYED_RESCUE: 2, BLESS_REVOKED: 1 } },
+          { t: "档案室：名字被划掉的那一页。", s: { NAME_STOLEN: 2, MARKED_WATCHED: 1 } },
+          { t: "舞台与聚光灯：上台、谢幕、被遗忘。", s: { USED_TOOL: 2, IGNORED_NOISE: 1 } },
+          { t: "倒计时与回溯：同一天重复很多次。", s: { PUNISHED_LOOP: 2, KEY_VARIABLE: 1 } }
+        ]
+      },
+      {
+        q: "当TA终于“赢一次”，世界更可能：",
+        hint: "世界对胜利的处理方式，就是它的恶趣味。",
+        options: [
+          { t: "承认胜利，但立刻提高代价。", s: { KEY_VARIABLE: 1, MARKED_WATCHED: 2 } },
+          { t: "说胜利属于别人，TA只是执行者。", s: { USED_TOOL: 2, IGNORED_NOISE: 1 } },
+          { t: "用温柔包装，把TA带回笼子里。", s: { TAMED_REFORGED: 2, BLESS_REVOKED: 1 } },
+          { t: "证明TA“果然危险”，开始清除。", s: { PURGED_THREAT: 2, NAME_STOLEN: 1 } }
+        ]
+      },
+      {
+        q: "最后一题：如果让你给TA的结局留一句话，你会写：",
+        hint: "选一句你最想截图发OC圈的。",
+        options: [
+          { t: "“我会把我的名字取回来。”", s: { NAME_STOLEN: 2, KEY_VARIABLE: 1 } },
+          { t: "“我不是被看见，我是被锁定。”", s: { MARKED_WATCHED: 2, PURGED_THREAT: 1 } },
+          { t: "“既然我只是工具，那我也会断电。”", s: { USED_TOOL: 2, TAMED_REFORGED: 1 } },
+          { t: "“我学会了不期待准时的救赎。”", s: { DELAYED_RESCUE: 2, BLESS_REVOKED: 1 } }
+        ]
+      }
+    ];
+
+    // --- state ---
+    const total = QUESTIONS.length;
+    let idx = 0;
+    const answers = new Array(total).fill(null); // store option index
+    const scores = Object.fromEntries(TYPES.map(t => [t, 0]));
+    let tieBreak = 0; // small deterministic flavor based on choices
+
+    // --- elements ---
+    const qTitle = document.getElementById("qTitle");
+    const qHint  = document.getElementById("qHint");
+    const qNo    = document.getElementById("qNo");
+    const opts   = document.getElementById("opts");
+    const progText = document.getElementById("progText");
+    const barFill  = document.getElementById("barFill");
+    const btnBack  = document.getElementById("btnBack");
+    const btnReset = document.getElementById("btnReset");
+
+    const modeTitle = document.getElementById("modeTitle");
+    const modeSub   = document.getElementById("modeSub");
+
+    const quizView = document.getElementById("quizView");
+    const resultView = document.getElementById("resultView");
+
+    const rTitle = document.getElementById("rTitle");
+    const rMeta = document.getElementById("rMeta");
+    const rQuote = document.getElementById("rQuote");
+    const rAttitude = document.getElementById("rAttitude");
+    const rTraits = document.getElementById("rTraits");
+    const rArc = document.getElementById("rArc");
+    const rLine = document.getElementById("rLine");
+
+    const btnCopy = document.getElementById("btnCopy");
+    const btnRestart = document.getElementById("btnRestart");
+    const toast = document.getElementById("toast");
+
+    // --- helpers ---
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function setToast(text){
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    function recomputeScores(){
+      // reset
+      for (const k of TYPES) scores[k] = 0;
+      tieBreak = 0;
+
+      for (let i = 0; i < total; i++){
+        const a = answers[i];
+        if (a === null) continue;
+        const opt = QUESTIONS[i].options[a];
+        for (const [k,v] of Object.entries(opt.s)){
+          scores[k] += v;
+        }
+        // tie break uses option index + question index
+        tieBreak += (i+1) * (a+1);
+      }
+    }
+
+    function progressDone(){
+      return answers.filter(x => x !== null).length;
+    }
+
+    function renderProgress(){
+      const done = progressDone();
+      progText.textContent = `进度：${done} / ${total}`;
+      const pct = (done / total) * 100;
+      barFill.style.width = `${pct}%`;
+    }
+
+    function renderQuestion(){
+      modeTitle.textContent = "MISSION";
+      modeSub.textContent = "答题中";
+
+      const item = QUESTIONS[idx];
+      qNo.textContent = `Q${idx+1}`;
+      qTitle.textContent = item.q;
+      qHint.textContent = item.hint || "从四个选项里选一个。";
+
+      // FIX: 暂时禁用 pointer-events，防止渲染瞬间立刻触发高亮
+      opts.style.pointerEvents = 'none';
+      setTimeout(() => {
+        opts.style.pointerEvents = 'auto';
+      }, 400); // 略大于动画时间
+
+      opts.innerHTML = "";
+      item.options.forEach((op, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn";
+        btn.innerHTML = `
+          <div class="k">${String.fromCharCode(65+i)}</div>
+          <div class="t">
+            ${op.t}
+            <small>点击选择</small>
+          </div>
+        `;
+        btn.addEventListener("click", () => {
+          answers[idx] = i;
+          recomputeScores();
+          renderProgress();
+
+          // auto next or finish
+          if (idx < total - 1){
+            idx++;
+            renderQuestion();
+          } else {
+            showResult();
+          }
+        });
+        opts.appendChild(btn);
+      });
+
+      btnBack.disabled = (idx === 0);
+      btnBack.style.opacity = (idx === 0) ? .55 : 1;
+
+      renderProgress();
+    }
+
+    function pickResultType(){
+      // highest score, with deterministic tie-breaking
+      let best = TYPES[0];
+      let bestScore = -Infinity;
+
+      for (const t of TYPES){
+        const s = scores[t];
+        if (s > bestScore){
+          bestScore = s;
+          best = t;
+        } else if (s === bestScore){
+          // tie-break: hash of (tieBreak + t index)
+          const a = (tieBreak + TYPES.indexOf(t) * 97) % 1000;
+          const b = (tieBreak + TYPES.indexOf(best) * 97) % 1000;
+          if (a > b) best = t;
+        }
+      }
+      return { type: best, score: bestScore };
+    }
+
+    function showResult(){
+      recomputeScores();
+      const done = progressDone();
+      if (done < total){
+        // if user reaches result early (shouldn't), jump them back
+        idx = done;
+        renderQuestion();
+        return;
+      }
+
+      const { type, score } = pickResultType();
+      const d = RESULT_DATA[type];
+
+      modeTitle.textContent = "RESULT";
+      modeSub.textContent = "命运卡已生成";
+
+      rTitle.textContent = d.title;
+      rMeta.textContent  = `命运判词强度：${score} · 结果类型：${type}`;
+      rQuote.textContent = d.quote;
+      rAttitude.textContent = d.attitude;
+      rTraits.textContent = d.traits;
+      rArc.textContent = d.arc;
+      rLine.textContent = d.line;
+
+      quizView.style.display = "none";
+      resultView.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetAll(){
+      idx = 0;
+      for (let i=0;i<total;i++) answers[i] = null;
+      recomputeScores();
+      renderProgress();
+      resultView.style.display = "none";
+      quizView.style.display = "block";
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // --- controls ---
+    btnBack.addEventListener("click", () => {
+      if (idx === 0) return;
+      idx--;
+      renderQuestion();
+    });
+
+    btnReset.addEventListener("click", () => {
+      resetAll();
+      setToast("已重置");
+    });
+
+    btnRestart.addEventListener("click", () => {
+      resetAll();
+      setToast("再来一局");
+    });
+
+    btnCopy.addEventListener("click", async () => {
+      const { type, score } = pickResultType();
+      const d = RESULT_DATA[type];
+      const text =
+`【你的OC被这个世界如何对待？】
+结果：${d.title}
+世界态度：${d.attitude}
+命运特征：${d.traits}
+适合走向：${d.arc}
+台词：${d.line}
+
+created by Hikaly`;
+
+      try{
+        await navigator.clipboard.writeText(text);
+        setToast("已复制结果文案");
+      }catch(e){
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        setToast("已复制（兼容模式）");
+      }
+    });
+
+    // init
+    recomputeScores();
+    renderQuestion();
+  </script>
+</body>
+</html>
