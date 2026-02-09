@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC 生日/星象/代表物 生成器 [深度排版版]</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap');
+
+        :root {
+            --primary: #ff7eb3;
+            --accent: #24c6dc;
+            --bg-color: #fff0f5;
+            --text-main: #514a9d;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --dark-blue: #2c3e50;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(var(--accent) 1.5px, transparent 1.5px), radial-gradient(var(--primary) 1.5px, #fff0f5 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 550px;
+            border-radius: 30px;
+            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(255, 126, 179, 0.2), inset 0 0 0 4px #eef2ff;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .top-deco {
+            height: 15px;
+            background: repeating-linear-gradient(45deg, var(--primary), var(--primary) 10px, var(--accent) 10px, var(--accent) 20px);
+        }
+
+        .header { text-align: center; padding: 25px 20px 10px; }
+        .header h1 { margin: 0; font-size: 1.6rem; color: var(--text-main); text-shadow: 2px 2px 0px rgba(255, 126, 179, 0.3); }
+        .badge-icon { background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; vertical-align: middle; margin-left: 5px; }
+
+        .content { padding: 15px 25px 35px; }
+
+        .step { display: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .step.active { display: block; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .mode-tab { display: flex; gap: 10px; margin-bottom: 20px; background: #eee; padding: 5px; border-radius: 15px; }
+        .tab-btn { flex: 1; border: none; padding: 8px; border-radius: 10px; cursor: pointer; font-weight: bold; background: transparent; color: #888; transition: 0.3s; }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        .option-group { margin-bottom: 18px; }
+        .label { font-weight: 800; display: block; margin-bottom: 8px; color: var(--primary); font-size: 1rem; }
+        .label::before { content: '✦ '; color: var(--accent); }
+
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #eee; 
+            font-family: inherit; font-size: 1rem; box-sizing: border-box; outline: none;
+        }
+
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .radio-btn { position: relative; }
+        .radio-btn input { position: absolute; opacity: 0; }
+        .radio-btn span {
+            display: block; padding: 8px 4px; background: white; border: 2px solid #e0e0e0;
+            border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 0.9rem; font-weight: bold; color: #888;
+        }
+        .radio-btn input:checked + span { border-color: var(--primary); color: var(--primary); background: #fff5f8; transform: translateY(-2px); box-shadow: 0 4px 0 var(--primary); }
+
+        .action-btn {
+            width: 100%; padding: 16px; background: linear-gradient(90deg, var(--primary), #ff9a9e);
+            color: white; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 800;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 6px 20px rgba(255, 126, 179, 0.4);
+            margin-top: 15px; position: relative; overflow: hidden;
+        }
+
+        .result-card {
+            background: white; border: 3px solid var(--accent); border-radius: 20px; padding: 25px;
+            margin-bottom: 20px; position: relative; box-shadow: 0 10px 25px rgba(36, 198, 220, 0.1);
+        }
+        .ssr-badge { position: absolute; top: -12px; right: -5px; background: linear-gradient(45deg, #FFD700, #FFA500); color: white; font-weight: 900; padding: 4px 12px; border-radius: 20px; transform: rotate(10deg); font-size: 0.8rem; border: 2px solid white; z-index: 10; }
+        .res-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px dashed #eee; margin-bottom: 15px; padding-bottom: 5px; }
+        .res-name { font-size: 1.8rem; font-weight: 900; color: var(--text-main); }
+        .res-star { font-size: 1.1rem; color: var(--accent); font-weight: 800; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .res-field { margin-bottom: 5px; }
+        .res-label { font-size: 0.75rem; color: #999; font-weight: bold; display: block; margin-bottom: 2px; }
+        .res-val { font-size: 0.95rem; color: var(--dark-blue); font-weight: bold; }
+        .full-width { grid-column: span 2; border-top: 1px solid #f9f9f9; padding-top: 8px; }
+        .res-quote { font-style: italic; color: #666; font-size: 0.9rem; line-height: 1.4; }
+        .res-hook { font-size: 0.8rem; color: #888; background: #fcfcfc; padding: 8px; border-radius: 8px; border-left: 3px solid var(--primary); }
+
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 10px 25px; border-radius: 50px;
+            font-size: 0.9rem; z-index: 999; opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .footer-credit { position: fixed; bottom: 10px; left: 0; width: 100%; text-align: center; font-size: 0.8rem; color: var(--text-main); opacity: 0.7; font-weight: bold; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-deco"></div>
+        <div class="header">
+            <h1>OC PROFILE <span class="badge-icon">星象仪 V1.0 (展开版)</span></h1>
+        </div>
+
+        <div class="content">
+            <div id="step1" class="step active">
+                <div class="mode-tab">
+                    <button class="tab-btn active" onclick="switchMode('easy', this)">一键生成</button>
+                    <button class="tab-btn" onclick="switchMode('detail', this)">深度干预</button>
+                </div>
+
+                <div class="option-group">
+                    <span class="label">OC 名字</span>
+                    <input type="text" id="inputName" placeholder="不填则由星象决定...">
+                </div>
+
+                <div id="detailOptions" style="display: none;">
+                    <div class="option-group">
+                        <span class="label">生日</span>
+                        <input type="date" id="inputBirth">
+                    </div>
+                    <div class="option-group">
+                        <span class="label">关键词介入</span>
+                        <input type="text" id="inputKey" placeholder="如：枷锁、蝴蝶、齿轮...">
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <span class="label">气质倾向</span>
+                    <div class="btn-grid">
+                        <label class="radio-btn"><input type="radio" name="vibes" value="冷" checked><span>🧊 冷</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="热"><span>🔥 热</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="甜"><span>🍰 甜</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="病"><span>💊 病</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="圣"><span>⛪ 圣</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="邪"><span>😈 邪</span></label>
+                        <label class="radio-btn"><input type="radio" name="vibes" value="中"><span>⚖️ 中</span></label>
+                    </div>
+                </div>
+
+                <button class="action-btn" onclick="generate()">✨ 观测星命 ✨</button>
+            </div>
+
+            <div id="step2" class="step">
+                <div id="resultOutput"></div>
+                <button class="action-btn" onclick="copyResultText()">📋 复制文本设定</button>
+                <button class="action-btn" style="background:white; color:#888; box-shadow:none; border:2px solid #eee; font-size:0.9rem; margin-top:10px;" onclick="goBack()">↩️ 修改</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">已复制!</div>
+    <div class="footer-credit">Created By Hikaly</div>
+
+    <script>
+        const db = {
+            // === 50+ 名字库 ===
+            names: [
+                "希尔", "零", "维恩", "莉莉丝", "塞勒斯", "艾叶", "朔", "弥生", "伊绪", "尤里安",
+                "诺亚", "卡缪", "千岁", "白夜", "幽", "灰", "翡翠", "凛", "空", "海音",
+                "离", "浅雾", "深月", "瑞希", "萤", "真宵", "亚夜", "雷切", "辛", "路易",
+                "克罗艾", "桃乐丝", "塞西尔", "赫尔", "梵", "苍", "影", "瞬", "遥", "透",
+                "莲", "陆", "伊吹", "凪", "千秋", "时雨", "夏目", "冬月", "春歌", "秋山"
+            ],
+
+            // === 星座定义 ===
+            constellations: [
+                {n: "白羊座", d: [321, 419]},
+                {n: "金牛座", d: [420, 520]},
+                {n: "双子座", d: [521, 621]},
+                {n: "巨蟹座", d: [622, 722]},
+                {n: "狮子座", d: [723, 822]},
+                {n: "处女座", d: [823, 922]},
+                {n: "天秤座", d: [923, 1023]},
+                {n: "天蝎座", d: [1024, 1122]},
+                {n: "射手座", d: [1123, 1221]},
+                {n: "摩羯座", d: [1222, 119]},
+                {n: "水瓶座", d: [120, 218]},
+                {n: "双鱼座", d: [219, 320]}
+            ],
+
+            // === 50+ 主题库 ===
+            themes: [
+                "永恒余烬", "虚空共鸣", "破碎秩序", "深海梦境", "终焉审判",
+                "流浪星尘", "机械福音", "禁忌契约", "极光观测", "荒原歌者",
+                "逆时沙漏", "彼岸花语", "苍白祷告", "灰烬之诗", "混沌残响",
+                "幽灵波长", "无垢囚牢", "黄昏见证", "溯行螺旋", "凋零圣域",
+                "静谧黑洞", "绯红月相", "白银意志", "铁锈挽歌", "梦魇编织",
+                "苍穹裂痕", "万物溯源", "几何神谕", "幽冥闪烁", "星火悖论",
+                "绝望花火", "幻觉花园", "寂灭齿轮", "腐朽王座", "纯白噪音",
+                "荆棘乐章", "浮光泡影", "沉溺之渊", "永夜灯塔", "无声寒潮",
+                "迷失罗盘", "永生灰烬", "破晓晨曦", "深渊呼吸", "诅咒纹章",
+                "失落信标", "命运织机", "灵魂质押", "无边落木", "萤火迷踪"
+            ],
+
+            // === 50+ 物品库 ===
+            items: [
+                "银质怀表", "生锈的鸟笼", "蓝调口琴", "塔罗牌", "单片镜",
+                "褪色的红丝带", "琉璃药瓶", "旧胶卷", "漆封密信", "陶瓷眼球",
+                "黑檀木烟斗", "水晶灵摆", "生锈钥匙", "蝴蝶标本", "蕾丝手套",
+                "破旧地图", "黄铜罗盘", "木刻人偶", "空白日记", "断弦的小提琴",
+                "枯萎的玫瑰", "羽毛笔", "猫眼石坠", "生锈手术刀", "齿轮机芯",
+                "象牙棋子", "陈旧望远镜", "香薰蜡烛", "十字架项链", "染血绷带",
+                "银质餐叉", "指南针", "玻璃弹珠", "铜质手铃", "折叠直尺",
+                "老式钢笔", "铁盒薄荷糖", "漆黑邀请函", "珍珠纽扣", "刺绣手帕",
+                "彼岸花", "黑郁金香", "蓝宝石", "黑曜石", "仪式细剑",
+                "白磷手枪", "骨笛", "折叠长刀", "仪式短匕", "曼陀罗根"
+            ],
+
+            // === 50+ 天气库 ===
+            weathers: [
+                "永不放晴的雨季", "极光掠过的寒夜", "漫天飞舞的灰烬", "微风拂过的旧校舍", "暴雨前的紫色低压",
+                "初雪落下的瞬间", "红月升起的午夜", "浓雾锁住的码头", "烈日下的蝉鸣断点", "流星划破的荒野",
+                "落日熔金的余晖", "无声的真空带", "樱花飘落的骤雨", "冰川消融的清晨", "焚毁世界的烈焰",
+                "雷鸣交织的深渊", "萤火点燃的夏夜", "永恒凝固的冰点", "干燥起火的荒漠", "潮湿发霉的雨林",
+                "极夜里的第一缕光", "日全食的观测时刻", "飓风过境的死寂", "繁星坠落的海面", "被酸雨腐蚀的废土",
+                "漫天黄沙的过往", "白夜里的苍白日光", "粉色泡沫的云层", "铁锈味的空气", "冰冷的蓝调时刻",
+                "暖冬里的假性阳光", "狂风卷积的落叶", "梅雨季节的青苔", "枯萎的春日盛景", "霜降时的寂静林间",
+                "电磁暴后的闪烁天际", "充满硫磺味的黎明", "海啸前的离岸潮", "永无止境的黄昏", "万物复苏的刹那",
+                "陨石击穿的大气", "充满灰尘的藏书馆", "冰冷刺骨的地下室", "从未停歇的沙暴", "带有苦杏仁味的空气",
+                "玫瑰色的黎明前奏", "被极寒冻结的瀑布", "从未亮起的永夜城", "被云层遮蔽的日光", "湿冷入骨的秋分"
+            ],
+
+            // === 50+ 气质色库 ===
+            colors: [
+                {n:"黛蓝",c:"#1e2a44"}, {n:"胭脂",c:"#9d2933"}, {n:"缃叶",c:"#e2c17c"}, {n:"月白",c:"#d6ecf0"}, {n:"玄色",c:"#1a1a1a"},
+                {n:"薄荷",c:"#bdfcc9"}, {n:"桃夭",c:"#f9906f"}, {n:"苏梅",c:"#704050"}, {n:"绀青",c:"#001f3f"}, {n:"朱砂",c:"#ff4d40"},
+                {n:"鸦青",c:"#424c50"}, {n:"缟羽",c:"#f5f5f5"}, {n:"琉璃",c:"#2a5caa"}, {n:"琥珀",c:"#ffbf00"}, {n:"黛紫",c:"#574266"},
+                {n:"竹青",c:"#789262"}, {n:"荼白",c:"#f3f9f1"}, {n:"赤金",c:"#f2be45"}, {n:"青碧",c:"#45b787"}, {n:"藕粉",c:"#edd1d8"},
+                {n:"铅灰",c:"#708090"}, {n:"柏绿",c:"#213d30"}, {n:"姜黄",c:"#d9b611"}, {n:"樱草",c:"#eaff56"}, {n:"靛蓝",c:"#065279"},
+                {n:"石榴",c:"#f15b6c"}, {n:"水墨",c:"#2f3539"}, {n:"橘红",c:"#ff461f"}, {n:"苍翠",c:"#519a73"}, {n:"藕荷",c:"#e4c6d0"},
+                {n:"幽紫",c:"#483d8b"}, {n:"萤光",c:"#ccff00"}, {n:"极地",c:"#f0f8ff"}, {n:"余晖",c:"#ff7f50"}, {n:"深渊",c:"#000080"},
+                {n:"古铜",c:"#b87333"}, {n:"银汞",c:"#e5e5e5"}, {n:"玫瑰",c:"#ff007f"}, {n:"枯草",c:"#d2b48c"}, {n:"苔藓",c:"#8a9a5b"},
+                {n:"薄暮",c:"#778899"}, {n:"星尘",c:"#4b0082"}, {n:"珊瑚",c:"#ff7f50"}, {n:"薄雾",c:"#f5f5f5"}, {n:"烈焰",c:"#ff4500"},
+                {n:"灰蓝",c:"#5d6d7e"}, {n:"暗金",c:"#996515"}, {n:"酒红",c:"#800020"}, {n:"湖蓝",c:"#44cef6"}, {n:"藕白",c:"#f0f5f9"}
+            ],
+
+            // === 50+ 禁忌库 ===
+            taboos: [
+                "在午夜三点后直视镜子", "呼唤早已死去的旧名", "触碰左手腕的缠绕处", "食用任何含糖的祭品", "在晴天打伞",
+                "向流浪猫述说心事", "在森林里提及『门』", "忘记每日的祷告次数", "书写关于未来的剧本", "踏入影子重叠的区域",
+                "在日落前闭上双眼", "拒绝陌生人的红苹果", "收集死者的指纹", "在雨天唱歌", "直视太阳的黑子",
+                "触碰那个冰冷的项圈", "在图书馆大声朗读禁书", "踏入那个废弃的钟塔", "修剪带血的指甲", "在满月时独自外出",
+                "忘记佩戴那枚戒指", "向井底投掷石块", "直呼那位的神名", "在冰面上跳舞", "收集自己的泪水",
+                "食用过期的罐头", "触碰任何银制餐具", "在黑暗中点燃三根火柴", "翻开那本空白的家谱", "在墓地里奔跑",
+                "直视深渊超过十秒", "拒绝夜晚的邀约", "忘记清理耳边的低语", "在灰烬中寻找真相", "触碰那个生锈的齿轮",
+                "向风诉说真实的愿望", "在深夜里修剪阴影", "提及关于『外面』的事情", "收集破碎的镜片", "在水中屏息过久",
+                "触摸那张褪色的照片", "忘记喂食那个笼子", "在枯萎的花丛中入睡", "触碰自己的倒影", "向流浪汉出卖灵魂",
+                "在祭坛前哭泣", "忘记关上那扇沉重的门", "在暴雨中保持干爽", "直视神像的眼睛", "触碰那个发烫的伤疤"
+            ],
+
+            // === 50+ 台词库 ===
+            quotes: [
+                "“即便星辰陨落，我的观测也不会停止。”", "“嘘，不要惊醒这片海下的秘密。”", "“代价？那种东西早就付清了。”", "“在这场名为永恒的实验里，你我是唯一的变量。”", "“有些伤口，是开在灵魂上的花。”",
+                "“你看，雪落在手心时是不疼的。”", "“如果这一切都是幻觉，请不要叫醒我。”", "“在那扇门后，我见到了真正的地狱。”", "“我的心早已跳动在另一个时空。”", "“这具身体，不过是灵魂的临时容器。”",
+                "“痛苦是清醒的唯一证据。”", "“把秘密藏进骨髓里，就不会被发现了。”", "“我们在废土上起舞，直到最后一盏灯熄灭。”", "“神明也只是高维度的赌徒。”", "“如果你能感受到我的心跳，那一定是错觉。”",
+                "“我闻到了，那是灵魂腐坏的味道。”", "“这个世界，本身就是一个巨大的错误。”", "“我们在名为命运的螺旋里越陷越深。”", "“请把我的名字，写在灰烬之上。”", "“孤独是某种慢性剧毒。”",
+                "“有些契约，一旦签订就无法回头。”", "“我是这个世界的旁观者，也是唯一的记录员。”", "“光芒太刺眼了，会灼伤影子的。”", "“别碰那里，那里装满了破碎的梦。”", "“把眼泪留给昨天，今天我们只需要麻木。”",
+                "“有些约定，原本就是为了被打破。”", "“我在地狱的入口，等了你整整三个纪元。”", "“这片荒原上，只有风还在诚实地哭泣。”", "“把灵魂质押给魔鬼，换取一分钟的自由。”", "“时间是种幻觉，我们从未真正前行。”",
+                "“在彻底毁灭之前，先学会享受毁灭。”", "“我是自己的主宰，也是自己的囚徒。”", "“把真相埋在深海里，让鱼群去守护。”", "“我们的相遇，是概率学上的奇迹。”", "“请记住我的气味，那是死亡的预兆。”",
+                "“在这个冰冷的机械世界，心跳是唯一的杂音。”", "“别害怕，那只是灵魂在脱壳的声音。”", "“我曾见过极光，在那之后世界皆为灰暗。”", "“把痛苦编织成王冠，戴在最显眼的地方。”", "“我们都是在迷雾中寻找灯塔的盲人。”",
+                "“这具肉身早已生锈，只有恨还新鲜。”", "“请不要试图治愈我，我爱极了我的病态。”", "“万物皆有裂痕，那是光照进来的地方。”", "“在虚无之中，我找到了存在的意义。”", "“请把我的骨灰，撒向那个从未存在过的远方。”",
+                "“我是命运的弃子，也是棋局的终结者。”", "“别用那种怜悯的眼神看我，那会让我恶心。”", "“在这场名为存在的闹剧里，我是最完美的丑角。”", "“有些爱，必须以毁灭作为注脚。”", "“嘘——你听，那是世界崩塌的声音。”"
+            ],
+
+            // === 50+ TA版 设定钩子 ===
+            hooks: [
+                "TA随身携带一件{item}，那是TA与世界最后的联系。",
+                "在{weather}中，TA总会想起那个被禁忌的午后。",
+                "TA背负着{theme}的宿命，行走在时空的夹缝中。",
+                "谁也无法预料，那个随手把玩{item}的少年竟是世界的观测者。",
+                "每当{weather}降临，TA的{item}就会发出诡异的鸣响。",
+                "在那件{item}的内部，刻着TA早已遗忘的本名。",
+                "TA是为了观测{theme}而生的残次品，却拥有了感情。",
+                "在那场{weather}后，TA再也没能找回自己的影子。",
+                "手中紧握着那件{item}，TA在寻找通往{theme}的钥匙。",
+                "被诅咒的{theme}在TA体内生根发芽，直到TA变成怪物。",
+                "TA是{weather}的化身，却渴望着一抹名为{item}的微光。",
+                "为了终结{theme}，TA必须毁掉那件视为生命的{item}。",
+                "在那个漫长的{weather}里，TA与魔鬼交换了关于{item}的秘密。",
+                "这具身体只是为了盛放{theme}而存在的皮囊。",
+                "当{weather}再次降临，世界将见证{theme}的彻底苏醒。",
+                "TA用{item}交换了一个永恒的吻，代价是灵魂的凋零。",
+                "在荒原的尽头，TA独自守望着关于{theme}的墓碑。",
+                "那件{item}散发着腐朽的气味，却让TA感到莫名的安心。",
+                "TA是唯一能在这场{weather}中幸存的人类，或者说，曾经是。",
+                "TA的双眼曾目睹过{theme}的诞生，从此满是灰烬。",
+                "每隔一个纪元，TA都要在{weather}中献祭一件{item}。",
+                "关于{theme}的预言，早已写在TA随身携带的{item}上。",
+                "在这场永不停止的{weather}里，TA是唯一的导航员。",
+                "TA的心脏位置，跳动着一件发烫的{item}。",
+                "TA用余生去寻找那个能在{weather}中拥抱TA的人。",
+                "为了保护那件{item}，TA不惜拉着整个世界一起毁灭。",
+                "TA是{theme}的代理人，在人间收集名为『痛苦』的标本。",
+                "那件{item}是TA复仇的唯一工具，也是TA的弱点所在。",
+                "在所有的平行时空中，TA都在那场{weather}里失去了爱。",
+                "TA将灵魂缝补进那件{item}里，试图逃离名为{theme}的宿命。",
+                "在这具腐朽的皮囊下，藏着关于{theme}的终极奥义。",
+                "TA从废土中捡起了那件{item}，从此世界变得不同。",
+                "TA在{weather}中写下的情书，只有风能够读懂。",
+                "作为{theme}的终结者，TA的武器竟然只是一件普通的{item}。",
+                "TA在漫长的时光里，早已分不清现实与{theme}的边界。",
+                "那场{weather}带走了TA的语言，只留下一串关于{item}的暗号。",
+                "TA是被神遗忘的观测者，在{theme}的边缘徘徊。",
+                "手中的{item}是TA力量的来源，也是囚禁TA的牢笼。",
+                "在所有的故事结尾，TA都独自伫立在{weather}中。",
+                "TA将那件{item}埋入地底，试图葬掉关于{theme}的过去。",
+                "当TA再次睁开眼，世界已经陷入了无尽的{weather}。",
+                "那是关于{theme}的最后乐章，伴随着{item}的破碎。",
+                "TA在虚无中创造了{item}，只为在{weather}中给自己一点慰藉。",
+                "作为{theme}的继承者，TA必须学会忍受永恒的孤独。",
+                "在那件{item}的折射下，TA看到了世界毁灭的真相。",
+                "TA是行走的灾厄，所到之处皆会降下诡异的{weather}。",
+                "TA用那件{item}切割时空，寻找属于自己的那个{theme}。",
+                "关于TA的传说，总是起始于一个充满雾气的{weather}。",
+                "TA在那件{item}里藏了一滴眼泪，那是TA最后的人性。",
+                "当{theme}完成闭环，TA将消失在最寒冷的那个{weather}里。"
+            ]
+        };
+
+        // === 逻辑控制 ===
+        let currentMode = 'easy';
+        let generatedData = null;
+
+        function switchMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('detailOptions').style.display = (mode === 'detail') ? 'block' : 'none';
+        }
+
+        function getRand(arr) { 
+            return arr[Math.floor(Math.random() * arr.length)]; 
+        }
+
+        function generate() {
+            const vibe = document.querySelector('input[name="vibes"]:checked').value;
+            const customName = document.getElementById('inputName').value;
+            const name = customName || getRand(db.names);
+            const birth = document.getElementById('inputBirth').value;
+            const keyword = document.getElementById('inputKey').value;
+
+            // 计算星座
+            let star;
+            if (currentMode === 'detail' && birth) {
+                const date = new Date(birth);
+                const val = (date.getMonth() + 1) * 100 + date.getDate();
+                star = db.constellations.find(c => {
+                    if (c.n === "摩羯座" && (val >= 1222 || val <= 119)) return true;
+                    return val >= c.d[0] && val <= c.d[1];
+                })?.n || "未知星座";
+            } else {
+                star = getRand(db.constellations).n;
+            }
+
+            // 抽取核心数据
+            const item = getRand(db.items);
+            const theme = getRand(db.themes);
+            const weather = getRand(db.weathers);
+            const color = getRand(db.colors);
+            const taboo = getRand(db.taboos);
+            let quote = getRand(db.quotes);
+
+            // 关键词介入
+            if (keyword) {
+                quote = quote.replace("。”", `...${keyword}。”`);
+            }
+
+            // 渲染钩子
+            const hookTemplate = getRand(db.hooks);
+            const hook = hookTemplate
+                .replace(/{item}/g, item)
+                .replace(/{weather}/g, weather)
+                .replace(/{theme}/g, theme);
+
+            generatedData = { name, star, theme, item, weather, color, taboo, quote, hook, vibe };
+            
+            renderResult();
+
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        }
+
+        function renderResult() {
+            const d = generatedData;
+            document.getElementById('resultOutput').innerHTML = `
+                <div class="result-card">
+                    <div class="ssr-badge">${d.vibe}系记录</div>
+                    <div class="res-header">
+                        <div class="res-name">${d.name}</div>
+                        <div class="res-star">${d.star}</div>
+                    </div>
+                    <div class="res-grid">
+                        <div class="res-field">
+                            <span class="res-label">守护主题</span>
+                            <span class="res-val">${d.theme}</span>
+                        </div>
+                        <div class="res-field">
+                            <span class="res-label">核心物</span>
+                            <span class="res-val">${d.item}</span>
+                        </div>
+                        <div class="res-field">
+                            <span class="res-label">天象对应</span>
+                            <span class="res-val">${d.weather}</span>
+                        </div>
+                        <div class="res-field">
+                            <span class="res-label">气质色</span>
+                            <span class="res-val" style="display:flex;align-items:center;gap:5px;">
+                                <div style="width:12px;height:12px;border-radius:2px;background:${d.color.c};border:1px solid #ddd"></div>
+                                ${d.color.n}
+                            </span>
+                        </div>
+                        <div class="res-field full-width">
+                            <span class="res-label">禁忌行为</span>
+                            <span class="res-val">⚠️ ${d.taboo}</span>
+                        </div>
+                        <div class="res-field full-width">
+                            <span class="res-label">触发台词</span>
+                            <div class="res-quote">${d.quote}</div>
+                        </div>
+                        <div class="res-field full-width">
+                            <span class="res-label">设定钩子</span>
+                            <div class="res-hook">${d.hook}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyResultText() {
+            const d = generatedData;
+            const text = `「OC 观测报告」\n✦ 名字：${d.name}\n✦ 星象：${d.star}\n✦ 主题：${d.theme}\n✦ 物品：${d.item}\n✦ 天气：${d.weather}\n✦ 禁忌：${d.taboo}\n✦ 台词：${d.quote}\n✦ 钩子：${d.hook}\n#OC设定生成器 #TA #灵感观测`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const t = document.getElementById('toast');
+                t.style.opacity = '1';
+                setTimeout(() => t.style.opacity = '0', 2000);
+            });
+        }
+
+        function goBack() {
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        }
+    </script>
+</body>
+</html>
