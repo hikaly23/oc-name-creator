@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/oc-name-creator", "destination": "/" },
-    { "source": "/oc-world", "destination": "oc-world.html" }
+    { "source": "/oc-profile-2.0", "destination": "/oc-profile-2.0.html" },
+    { "source": "/oc-name-creator", "destination": "/index.html" },
+    { "source": "/oc-world", "destination": "/oc-world.html" }
   ]
 }
